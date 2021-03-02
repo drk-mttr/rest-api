@@ -1,0 +1,32 @@
+GET http://localhost:8080/shoppinglist
+
+###
+
+GET http://localhost:8080/shoppinglist/603e198b7a009011340b0d5d
+
+###
+
+POST http://localhost:8080/shoppinglist
+Content-Type: application/json
+
+{
+    "name": "ShoppingList 2",
+    "items": [
+        { "name": "Cereal" },
+        { "name": "Cheese" },
+        { "name": "Beer" }
+    ]
+}
+
+###
+
+PATCH http://localhost:8080/shoppinglist/603df4d62c3ffc0f4f161e2c
+Content-Type: application/json
+
+{
+    "name": "Shopping List 0"
+}
+
+###
+
+DELETE http://localhost:8080/shoppinglist/603e19c27a009011340b0d61
