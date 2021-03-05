@@ -10,7 +10,7 @@ POST http://localhost:8080/shoppinglist
 Content-Type: application/json
 
 {
-    "name": "ShoppingList 2",
+    "name": "ShoppingList 1",
     "items": [
         { "name": "Cereal" },
         { "name": "Cheese" },
@@ -20,13 +20,21 @@ Content-Type: application/json
 
 ###
 
-PATCH http://localhost:8080/shoppinglist/603df4d62c3ffc0f4f161e2c
+PATCH http://localhost:8080/shoppinglist/603e6bec7b02fa15a501f846
 Content-Type: application/json
 
 {
-    "name": "Shopping List 0"
+    "items": [
+        { "name": "Cereal" },
+        { "name": "Cheese" },
+        { "name": "Beer" }
+    ]
 }
 
 ###
 
-DELETE http://localhost:8080/shoppinglist/603e19c27a009011340b0d61
+DELETE http://localhost:8080/shoppinglist/603e5eab11ce2c135d420c68
+
+###
+
+OPTIONS http://localhost:8080/shoppinglist

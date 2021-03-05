@@ -3,6 +3,7 @@ const router = express.Router();
 const Shoppinglist = require('../models/shoppinglist.js'); //brings in the shoppinglist model
 
 // get all shoppinglists
+
 router.get('/', async (req, res) => {
     let shoppinglists;
     try {
@@ -14,17 +15,13 @@ router.get('/', async (req, res) => {
 });
 
 // get one shoppinglist
-router.get('/:id', async (req, res) => {
-    let shoppinglist;
-    try {
-        shoppinglist = await Shoppinglist.findById(req.params.id);
-        res.json(shoppinglist);
-    } catch (err) {
-        res.status(404).json({ message: err.message });
-    }
+
+router.get('/:id', getShoppinglist, (req, res) => {
+    res.json(res.shoppinglist);
 });
 
 // creating one shoppinglist
+
 router.post('/', async (req, res) => {
     const shoppinglist = new Shoppinglist({
         name: req.body.name,
@@ -39,38 +36,62 @@ router.post('/', async (req, res) => {
 });
 
 // update one shoppinglist
-router.patch('/:id', async (req, res) => {
-    let shoppinglist;
+
+router.patch('/:id', getShoppinglist, checkFields, async (req, res) => {
     try {
-        shoppinglist = await Shoppinglist.findById(req.params.id);
-        if (req.body.name != null) {
-            shoppinglist.name = req.body.name;
-        }
-        if (req.body.items != null) {
-            shoppinglist.items = req.body.items;
-        }
-        const newList = await shoppinglist.save();
-        res.json(shoppinglist);
+        const newList = await res.shoppinglist.save();
+        res.json(newList);
     } catch (err) {
         res.status(404).json({ message: err.message });
     }
 });
 
 // deleting one shoppinglist
-router.delete('/:id', async (req, res) => {
+
+router.delete('/:id', getShoppinglist, async (req, res) => {
+    try {
+        await res.shoppinglist.remove();
+        res.status(401).json({ message: "removed successfully" });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+//  ###### MIDDLEWARE ######
+
+/* attempts to find the shoppinglist in the db by ID. if
+    no shoppinglist is found, returns an error and a status.
+*/
+
+async function getShoppinglist(req, res, next) {
     let shoppinglist;
     try {
-        shopplinglist = await Shoppinglist.findById(req.params.id);
-        if (shopplinglist == null) {
-            return res.status(404).json({ message: "Cannot find shopping list with that ID"});
-        } else {
-            shoppinglist = await Shoppinglist.findById(req.params.id);
-            await shoppinglist.remove();
-            return res.status(401).json({ message: "removed successfully" });
+        shoppinglist = await Shoppinglist.findById(req.params.id);
+        if (shoppinglist == null) {
+            return res.status(400).json({ message: "Cannot find Shoppinglist with that ID." });
         }
     } catch (err) {
         return res.status(500).json({ message: err.message });
     }
-});
+    res.shoppinglist = shoppinglist;
+    next();
+}
+
+/* checks for populated fields in the JSON request. if
+    req.body.name (required field in the db schema) is not
+    passed in the payload, it returns a 400 error.
+*/
+
+function checkFields(req, res, next) {
+    if (req.body.name != null) {
+        res.shoppinglist.name = req.body.name;
+    } else {
+        return res.status(400).json({ message: "Shoppinglist name is required." });
+    }
+    if (req.body.items != null) {
+        res.shoppinglist.items = req.body.items;
+    }
+    next();
+}
 
 module.exports = router;
